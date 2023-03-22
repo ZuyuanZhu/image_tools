@@ -29,12 +29,22 @@ class CameraPublisher:
         self.bag = rosbag.Bag(self.bag_path, 'w')
 
     def publish_data(self):
+        seq = 0
         while not rospy.is_shutdown() and (self.current_image_index != self.num_images_0):
             image_filename = os.path.join(self.img_folder, self.image_files[self.current_image_index])
 
             try:
                 img_0 = imread(image_filename, IMREAD_COLOR)
                 ros_image = self.bridge.cv2_to_imgmsg(img_0, "bgr8")
+
+                # Set the sequence number for the message header
+                seq += 1
+                ros_image.header.seq = seq
+
+                # Set the time stamp for the message header
+                timestamp = rospy.Time.from_sec(os.path.getmtime(image_filename))
+                ros_image.header.stamp = timestamp
+
                 self.pub_cam0.publish(ros_image)
                 self.loginfo("Current image index is %d/%d " %
                              (self.current_image_index, self.num_images_0))
