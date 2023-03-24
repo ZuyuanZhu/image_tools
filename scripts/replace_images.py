@@ -8,8 +8,8 @@ from sensor_msgs.msg import Image
 
 
 
-bag_file = '/home/zuyuan/rasberry_ws/src/cslam_datasets/MH_01_easy_321.bag'
-image_folder = '/home/zuyuan/rasberry_ws/src/cslam_datasets/fake_images/'
+bag_file = '/home/zuyuan/Documents/dataset/MH_02_easy.bag'
+image_folder = '/media/zuyuan/DATA1TB/kitti/2011_10_03/2011_10_03_drive_0034_sync/image_00/line13-14/'
 image_names = []
 # Loop through each file in the folder
 for filename in os.listdir(image_folder):
@@ -22,13 +22,15 @@ image_names.sort()
 bag = rosbag.Bag(bag_file)
 
 # Create a new rosbag for writing
-new_bag_file = '/home/zuyuan/rasberry_ws/src/cslam_datasets/MH_01_easy_321_replaced.bag'
+new_bag_file = '/home/zuyuan/Documents/dataset/MH_02_easy_replaced.bag'
 new_bag = rosbag.Bag(new_bag_file, 'w')
 idx = 0
 # Loop through each message in the input rosbag
 for topic, msg, t in bag.read_messages():
     # Check if the topic is the one you want to replace the image
     if topic == '/cam0/image_raw':
+        if idx == len(image_names):
+            break
         # Load the image from the folder
         image_path = image_folder + image_names[idx]
         idx += 1
