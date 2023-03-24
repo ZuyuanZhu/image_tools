@@ -8,6 +8,7 @@ import os
 import rosbag
 from evo.tools import file_interface
 import re
+from pathlib import Path
 
 
 
@@ -28,7 +29,12 @@ class CameraPublisher:
         self.current_image_index = 0
         self.current_pos_index = 0
 
-        self.bag_path = os.path.join(self.base_path, 'output', folder_, 'bags' + '.bag')
+        # Create the destination folder if it doesn't exist
+        self.bag_folder_path = os.path.join(self.base_path, 'output', folder_)
+        if not Path(self.bag_folder_path).exists():
+            Path(self.bag_folder_path).mkdir()
+
+        self.bag_path = os.path.join(self.bag_folder_path, 'bags' + '.bag')
         self.bag = rosbag.Bag(self.bag_path, 'w')
 
         self.time_stamps = time_stamps_
@@ -95,7 +101,7 @@ if __name__ == '__main__':
 
     base_path = '/media/zuyuan/DATA1TB/kitti/kitti_splited/2011_10_03/'
     time_stamps = '/home/zuyuan/Documents/dataset/kitti/dataset/sequences/02/times.txt'
-    folder = 'line13-14'
+    folder = 'line12-13'
     verbose = True
     camera_publisher = CameraPublisher(base_path, folder, time_stamps, verbose)
 
