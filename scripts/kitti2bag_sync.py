@@ -9,6 +9,7 @@ import rosbag
 from evo.tools import file_interface
 import re
 from pathlib import Path
+from copy_images_between_range import copy_images_between_range
 
 
 
@@ -100,8 +101,16 @@ class CameraPublisher:
 if __name__ == '__main__':
 
     base_path = '/media/zuyuan/DATA1TB/kitti/kitti_splited/2011_10_03/'
+    folder = 'line9-10.5'
+    source_folder = '/media/zuyuan/DATA1TB/kitti/2011_10_03/2011_10_03_drive_0034_sync/image_00/data/'
+    start = 2969
+    end = 3450
+    dest_folder = base_path + folder
+
+    copy_images_between_range(source_folder, start, end, dest_folder)
+    print("Images have been copied to the %s folder." % dest_folder)
+
     time_stamps = '/home/zuyuan/Documents/dataset/kitti/dataset/sequences/02/times.txt'
-    folder = 'line12-13'
     verbose = True
     camera_publisher = CameraPublisher(base_path, folder, time_stamps, verbose)
 
