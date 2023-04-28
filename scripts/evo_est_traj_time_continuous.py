@@ -5,9 +5,10 @@ import numpy as np
 from evo.tools.file_interface import read_tum_trajectory_file, write_tum_trajectory_file
 from evo.core import trajectory
 import csv
+import io
 
 
-base_path = "/home/zuyuan/rasberry_ws/src/data_kitti/OUTPUT/Traj_Vis/seq00_agentA0-320_agentB1378-1698_test/"
+base_path = "/home/zuyuan/Documents/dataset/kitti/Traj_Vis/Self_trained_ORBvoc_seq00/seq00_1-2_10-11/"
 agentA_traj_sort = base_path + "KF_GBA_0_sorted.csv"
 agentB_traj_sort = base_path + "KF_GBA_1_sorted.csv"
 groundTruth_orig = base_path + "00_time_poses_selected.csv"
@@ -52,7 +53,7 @@ combined_rows = a_rows + b_rows
 
 combined = base_path + 'KF_GBA_0_1_sorted_cont.csv'
 # Write the combined rows to a new CSV file
-with open(combined, 'w', newline='') as combined_file:
+with io.open(combined, 'wb') as combined_file:
     writer = csv.writer(combined_file)
     writer.writerows(combined_rows)
 
