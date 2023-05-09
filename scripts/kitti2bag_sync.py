@@ -109,11 +109,11 @@ class CameraPublisher:
 
 if __name__ == '__main__':
 
-    base_path = '/media/zuyuan/DATA1TB/kitti/kitti_splited/2011_10_03/'
-    folder = 'line9-10.5'
+    base_path = '/media/zuyuan/DATA1TB/kitti/kitti_splited/2011_10_03_0034_seq02/'
+    folder = 'line2-3.5'
     source_folder = '/media/zuyuan/DATA1TB/kitti/2011_10_03/2011_10_03_drive_0034_sync/image_00/data/'
-    start = 2969
-    end = 3450
+    start = 688
+    end = 1165
     dest_folder = base_path + folder
 
     copy_images_between_range(source_folder, start, end, dest_folder)
