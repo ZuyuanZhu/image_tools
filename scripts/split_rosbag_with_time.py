@@ -6,6 +6,8 @@ def split_bag(input_bag, output_bag, start_time_sec, end_time_sec):
     start_time = None
     end_time = None
 
+    print(f"Reading rosbag: {input_bag}")
+
     # Get start time of the bag
     with Bag(input_bag, 'r') as bag:
         start_time = bag.get_start_time() + start_time_sec
@@ -27,11 +29,13 @@ def split_bag(input_bag, output_bag, start_time_sec, end_time_sec):
             else:
                 break
 
+    print(f"New bag saved: {output_bag}")
+
 
 if __name__ == '__main__':
     base_path = '/media/zuyuan/DATA1TB/Jackal/bags_data_campaign_july_2023/'
     src_bag = base_path + 'test_4_2023-07-04-10-32-34.bag'
-    start_time = 30
-    end_time = 73
+    start_time = 73
+    end_time = 116
     output_bag = base_path + 'test_4_%d_%d.bag' % (start_time, end_time)
     split_bag(src_bag, output_bag, start_time, end_time)
