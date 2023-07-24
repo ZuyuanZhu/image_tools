@@ -24,7 +24,7 @@ class GPSPLOT:
 
         # Define time slots and corresponding colors
         self.time_slots = time_slots
-        self.colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+        self.colors = ['b', 'y', 'r', 'c', 'm', 'g', 'k']
 
         # Create data containers for each time slot
         self.slot_data = [{'longitude': [], 'latitude': [], 'times': []} for _ in self.time_slots]
@@ -37,7 +37,7 @@ class GPSPLOT:
         self.ax.set_ylabel('North (m)')
 
         # Create a line plot for the rest of the trajectory and for each time slot
-        self.rest_plot, = self.ax.plot([], [], 'o', color='gray', label='Rest of trajectory')
+        self.rest_plot, = self.ax.plot([], [], 'o', color='gray', markersize=4, label='Rest of trajectory')
         self.slot_plots = [self.ax.plot([], [], 'o', color=self.colors[i % len(self.colors)],
                                         label=f'Time slot {i + 1}: {slot[0]}-{slot[1]} sec')[0]
                            for i, slot in enumerate(self.time_slots)]
@@ -87,6 +87,7 @@ class GPSPLOT:
             slot_plot.set_data(slot_data['longitude'], slot_data['latitude'])
 
         self.ax.relim()
+        self.ax.set_aspect('equal')
         self.ax.autoscale_view()
 
 
