@@ -7,7 +7,7 @@ from pyproj import Proj
 
 
 class GPSPLOT:
-    def __init__(self, time_slots):
+    def __init__(self, time_slots, specific_timestamps):
         # Initialize node
         rospy.init_node("gps_plot_node")
 
@@ -32,7 +32,7 @@ class GPSPLOT:
 
         # Create a new empty plot
         self.fig, self.ax = plt.subplots()
-        self.ax.set_title('GPS data')
+        self.ax.set_title('LCD(ONNX) Detecting Loop Closure Frames')
         self.ax.set_xlabel('East (m)')
         self.ax.set_ylabel('North (m)')
 
@@ -41,6 +41,13 @@ class GPSPLOT:
         self.slot_plots = [self.ax.plot([], [], 'o', color=self.colors[i % len(self.colors)],
                                         label=f'Time slot {i + 1}: {slot[0]}-{slot[1]} sec')[0]
                            for i, slot in enumerate(self.time_slots)]
+
+        # Add specific timestamps and corresponding plot objects
+        self.specific_timestamps = specific_timestamps
+        self.special_points = [[] for _ in self.specific_timestamps]
+        self.point_plots = [self.ax.plot([], [], marker['style'], color=marker['color'], markersize=10,
+                                         label=f'LCD Matched Frame {i + 1}')[0]
+                            for i, marker in enumerate(self.specific_timestamps)]
 
         self.ax.legend()
 
@@ -71,12 +78,18 @@ class GPSPLOT:
                 slot_data['longitude'].append(lon)
                 slot_data['latitude'].append(lat)
                 slot_data['times'].append(t)
-                return
 
         # If the data point does not fall in any of the slots, append it to the rest of the trajectory
         self.rest_data['longitude'].append(lon)
         self.rest_data['latitude'].append(lat)
         self.rest_data['times'].append(t)
+
+        # Check if the timestamp matches any of the special timestamps
+        for i, marker in enumerate(self.specific_timestamps):
+            # print("marker['time']: {}, t: {}".format(marker['time'], t))
+            if marker['time'] - 0.1 <= t < marker['time'] + 0.1:  # add some tolerance
+                # print("lon: {}, lat: {}, t: {}".format(lon, lat, i))
+                self.special_points[i].append((lon, lat))
 
     def update_plot(self, i):
         # Update the data for the rest of the trajectory scatter plot
@@ -86,16 +99,33 @@ class GPSPLOT:
         for slot_plot, slot_data in zip(self.slot_plots, self.slot_data):
             slot_plot.set_data(slot_data['longitude'], slot_data['latitude'])
 
+        # Update the data for each specific point
+        for point_plot, points in zip(self.point_plots, self.special_points):
+            if points:  # Check if there are any points for this timestamp
+                lon, lat = zip(*points)  # Unzip the list of points into separate lists of longitudes and latitudes
+                point_plot.set_data(lon, lat)
+
         self.ax.relim()
         self.ax.set_aspect('equal')
         self.ax.autoscale_view()
 
 
 if __name__ == "__main__":
-    # Define time slots in seconds relative to the first message received
-    time_slots = [(10, 20), (25, 35)]
+    # Plot split trajectories only
+    # time_slots = [(10, 55), (127, 167), (225, 258)]   # rosbag 2
+    # time_slots = [(30, 73), (73, 116), (99, 140)]  # rosbag 4, old
+    # time_slots = [(0, 30), (35, 70), (73, 116), (120, 155)]  # rosbag 4 , new
+    # time_slots = [(0, 40), (124, 164)]  # rosbag 3
 
-    gps_plot = GPSPLOT(time_slots)
+    # used for plotting LCD(ONNX) matched frames
+    time_slots = [(35, 70), (73, 116)]  # rosbag 4 , slot 2, 3
+
+    specific_timestamps = [{'time': 54.4, 'style': 'x', 'color': 'black'},
+                           {'time': 101.5, 'style': 'x', 'color': 'black'}]
+                           # {'time': 70, 'style': 'o', 'color': 'red'},
+                           # {'time': 75, 'style': 'o', 'color': 'red'}]
+
+    gps_plot = GPSPLOT(time_slots, specific_timestamps)
 
     # Keep the script running
     rospy.spin()
