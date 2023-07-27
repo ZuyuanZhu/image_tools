@@ -118,12 +118,23 @@ if __name__ == "__main__":
     # time_slots = [(0, 40), (124, 164)]  # rosbag 3
 
     # used for plotting LCD(ONNX) matched frames
-    time_slots = [(35, 70), (73, 116)]  # rosbag 4 , slot 2, 3
+    # time_slots = [(35, 70), (73, 116)]  # rosbag 4 , slot 2, 3
+    # time_slots = [(10, 55), (127, 167)]  # rosbag 2, slot 1,2
+    # time_slots = [(10, 55), (225, 258)]  # rosbag 2, slot 1,3
+    time_slots = [(127, 167), (225, 258)]  # rosbag 2, slot 2,3
 
-    specific_timestamps = [{'time': 54.4, 'style': 'x', 'color': 'black'},
-                           {'time': 101.5, 'style': 'x', 'color': 'black'}]
-                           # {'time': 70, 'style': 'o', 'color': 'red'},
-                           # {'time': 75, 'style': 'o', 'color': 'red'}]
+    # specific_timestamps = [{'time': 14.2, 'style': 'x', 'color': 'black'},
+    #                        {'time': 138.6, 'style': 'x', 'color': 'black'},
+    #                        {'time': 14.9, 'style': 'o', 'color': 'red'},
+    #                        {'time': 144.4, 'style': 'o', 'color': 'red'}]
+
+    # specific_timestamps = [{'time': 21.7, 'style': 'x', 'color': 'black'},
+    #                        {'time': 236.5, 'style': 'x', 'color': 'black'},
+    #                        {'time': 33.1, 'style': 'o', 'color': 'red'},
+    #                        {'time': 250.0, 'style': 'o', 'color': 'red'}]
+
+    specific_timestamps = [{'time': 144.2, 'style': 'x', 'color': 'black'},
+                           {'time': 240.6, 'style': 'x', 'color': 'black'}]
 
     gps_plot = GPSPLOT(time_slots, specific_timestamps)
 
