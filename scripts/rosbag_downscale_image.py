@@ -9,13 +9,13 @@ from cv_bridge import CvBridge, CvBridgeError
 
 def resize_image(image_msg, bridge):
     # Convert the image message to an OpenCV image
-    cv_image = bridge.imgmsg_to_cv2(image_msg, desired_encoding='passthrough')
+    cv_image = bridge.imgmsg_to_cv2(image_msg, image_msg.encoding)
 
     # Resize the image
     resized_image = cv2.resize(cv_image, (640, 360))
 
     # Convert the OpenCV image back to an image message
-    resized_image_msg = bridge.cv2_to_imgmsg(resized_image, encoding='passthrough')
+    resized_image_msg = bridge.cv2_to_imgmsg(resized_image, encoding=image_msg.encoding)
 
     # Keep the header from the original image
     resized_image_msg.header = image_msg.header
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     bridge = CvBridge()
     base_path = "/media/zuyuan/DATA1TB/Jackal/bags_data_campaign_july_2023/"
-    in_bag_name = "test_2_10_55_select_frame_id_odom"
+    in_bag_name = "test_2_225_258_select_frame_id_odom"
     in_bag = rosbag.Bag(base_path + in_bag_name + ".bag")
     out_bag_name = in_bag_name + "_downscale"
     out_bag = rosbag.Bag(base_path + out_bag_name + ".bag", 'w')
