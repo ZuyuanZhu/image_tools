@@ -14,8 +14,10 @@ class GPSPLOT:
 
         # Initialize subscriber to '/navsat/fix' topic
         rospy.Subscriber("/sugv/emlid_rtk_rover/tcpfix", NavSatFix, self.gps_callback)
-        rospy.Subscriber("/sugv/odometry/filtered", Odometry, self.odom_callback)
+        # rospy.Subscriber("/sugv/odometry/filtered", Odometry, self.odom_callback)
+        rospy.Subscriber("/zed2/zed_node_test/odom", Odometry, self.zed_callback)
 
+        self.zed_data = {'longitude': [], 'latitude': []}
         self.odom_data = {'longitude': [], 'latitude': []}
 
         # Variables to store initial coordinates
@@ -24,6 +26,8 @@ class GPSPLOT:
         self.init_time = None
         self.init_odom_x = None
         self.init_odom_y = None
+        self.init_zed_x = None
+        self.init_zed_y = None
 
         # Create a projection for conversion
         self.proj = Proj(proj='utm', zone=33, ellps='WGS84', preserve_units=False)
@@ -38,13 +42,14 @@ class GPSPLOT:
 
         # Create a new empty plot
         self.fig, self.ax = plt.subplots()
-        self.ax.set_title('SUGV Odometry VS RTK GPS')
+        self.ax.set_title('ZED Odometry VS RTK GPS')
         self.ax.set_xlabel('East (m)')
         self.ax.set_ylabel('North (m)')
 
         # Create a line plot for the rest of the trajectory and for each time slot
-        self.rest_plot, = self.ax.plot([], [], 'o', color='gray', markersize=4, label='GPS')
-        self.odom_plot, = self.ax.plot([], [], 'o-', color='purple', markersize=4, label='Odometry')
+        self.rest_plot, = self.ax.plot([], [], 'o', color='gray', markersize=4, label='RTK GPS')
+        # self.odom_plot, = self.ax.plot([], [], 'o-', color='purple', markersize=4, label='SUGV Odometry')
+        self.zed_plot, = self.ax.plot([], [], 'o-', color='orange', markersize=4, label='ZED Odometry')
 
         self.slot_plots = [self.ax.plot([], [], 'o', color=self.colors[i % len(self.colors)],
                                         label=f'Time slot {i + 1}: {slot[0]}-{slot[1]} sec')[0]
@@ -63,6 +68,23 @@ class GPSPLOT:
         self.ani = FuncAnimation(self.fig, self.update_plot, interval=1000)
 
         plt.show()
+
+    def zed_callback(self, msg):
+        # Extract x, y from the pose message
+        x = msg.pose.pose.position.x
+        y = msg.pose.pose.position.y
+
+        # If initial zed readings are not stored, store them
+        if self.init_zed_x is None and self.init_zed_y is None:
+            self.init_zed_x = x
+            self.init_zed_y = y
+
+        # Subtract initial readings to get local coordinates
+        x -= self.init_zed_x
+        y -= self.init_zed_y
+
+        self.zed_data['longitude'].append(x)
+        self.zed_data['latitude'].append(y)
 
     def odom_callback(self, msg):
         # Extract x, y from the odometry message
@@ -119,7 +141,8 @@ class GPSPLOT:
     def update_plot(self, i):
         # Update the data for the rest of the trajectory scatter plot
         self.rest_plot.set_data(self.rest_data['longitude'], self.rest_data['latitude'])
-        self.odom_plot.set_data(self.odom_data['longitude'], self.odom_data['latitude'])
+        # self.odom_plot.set_data(self.odom_data['longitude'], self.odom_data['latitude'])
+        self.zed_plot.set_data(self.zed_data['longitude'], self.zed_data['latitude'])
 
         # Update the data for each time slot scatter plot
         for slot_plot, slot_data in zip(self.slot_plots, self.slot_data):
