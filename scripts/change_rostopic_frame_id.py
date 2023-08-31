@@ -9,7 +9,7 @@ import numpy as np
 
 # Open the bag file for reading
 bag_path = '/media/zuyuan/DATA1TB/Jackal/bags_data_campaign_july_2023/'
-bag_name = 'test_2_long_134_258_select'
+bag_name = 'test_2_10_55_pointCloud_select'
 src_bag = bag_path + bag_name + ".bag"
 bag = rosbag.Bag(src_bag, 'r')
 
@@ -17,8 +17,9 @@ bag = rosbag.Bag(src_bag, 'r')
 new_bag = rosbag.Bag(bag_path + bag_name + '_frame_id_odom.bag', 'w', compression=rosbag.Compression.NONE)
 
 # Initialize the frame ID counters
-frame_id_counter = 40000
-frame_id_counter_pose = 40000
+frame_id_counter = 10000
+frame_id_counter_pose = 10000
+frame_id_counter_pointCloud = 80000
 split_num = 2887
 
 # Flag to determine when to save the reset as a rosbag
@@ -41,6 +42,13 @@ for topic, msg, t in bag.read_messages():
         msg.header.frame_id = new_frame_id_pose
         # Increment the frame ID counter
         frame_id_counter_pose += 1
+    elif topic == '/sugv/velodyne_points':
+        # Convert the frame ID counter to a zero-padded string
+        new_frame_id_pose = str(frame_id_counter_pointCloud).zfill(10)
+        # Modify the frame ID of the position message
+        msg.header.frame_id = new_frame_id_pose
+        # Increment the frame ID counter
+        frame_id_counter_pointCloud += 1
 
     # Write the modified message to the new bag file
     new_bag.write(topic, msg, t)
