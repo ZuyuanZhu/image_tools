@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# outdated version, use evo pkg tools/reverse_and_relative.py
+
 import numpy as np
 from evo.tools.file_interface import read_tum_trajectory_file, write_tum_trajectory_file
 from evo.core import trajectory
@@ -27,8 +29,8 @@ class TrajectorySorter:
 
 
 if __name__ == "__main__":
-    base_path = "/home/zuyuan/Documents/dataset/kitti/Traj_Vis/Self_trained_ORBvoc_seq00/seq02_2-3.5_12-13/"
-    est_file = "KF_GBA_1.csv"
-    est_file_sorted = "KF_GBA_1_sorted.csv"
+    base_path = "/home/zuyuan/cslam_ws/src/multi-agent-slam/cslam/output/2nd_integration/rosbag_2_1_upper_half/"
+    est_file = "KF_GBA_0.csv"
+    est_file_sorted = "KF_GBA_0_sorted.csv"
     sorter = TrajectorySorter(base_path, est_file, est_file_sorted)
     sorter.sort_trajectory()
