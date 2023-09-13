@@ -39,6 +39,8 @@ def split_bag(input_bag, output_bag, start_time_sec, end_time_sec, sync_topics):
                         msg.transforms[i].header.stamp.nsecs = b_top2 * 10000000 + a_rest2
 
                 # only keep the first two msg
+                corret_time = t.to_sec() + start_time_sec
+                t = rospy.Time.from_sec(corret_time)
                 outbag.write(topic, msg, t)
                 num_tf += 1
                 continue
@@ -50,6 +52,8 @@ def split_bag(input_bag, output_bag, start_time_sec, end_time_sec, sync_topics):
                                 start_times[topic] = msg.header.stamp.to_sec()
                             stamp_temp = msg.header.stamp.to_sec() - start_times[topic] + time_ref.to_sec()
                             msg.header.stamp = rospy.Time.from_sec(stamp_temp)
+                            # corret_time = t.to_sec() - start_time_sec
+                            # t = rospy.Time.from_sec(corret_time)
                             outbag.write(topic, msg, t)
                     elif topic == '/tf_static' or '/tf':
                         # If time_ref is not yet set, grab the first timestamp as reference
@@ -58,6 +62,8 @@ def split_bag(input_bag, output_bag, start_time_sec, end_time_sec, sync_topics):
                                 start_times[topic] = msg.transforms[i].header.stamp.to_sec()
                             stamp_temp = msg.transforms[i].header.stamp.to_sec() - start_times[topic] + time_ref.to_sec()
                             msg.transforms[i].header.stamp = rospy.Time.from_sec(stamp_temp)
+                        # corret_time = t.to_sec() - start_time_sec
+                        # t = rospy.Time.from_sec(corret_time)
                         outbag.write(topic, msg, t)
                     else:
                         # For other topics, adjust the timestamp based on the reference
@@ -69,12 +75,11 @@ def split_bag(input_bag, output_bag, start_time_sec, end_time_sec, sync_topics):
 
 if __name__ == '__main__':
     base_path = '/media/zuyuan/DATA1TB/Jackal/bags_data_campaign_july_2023/'
-    src_bag = base_path + 'test_2_2023-07-04-10-13-18_select.bag'
+    src_bag = base_path + 'test_2_2023-07-04-10-13-18_select_tf.bag'
     start_time = 10
     end_time = 55
     output_bag = base_path + 'test_2_tf_%d_%d.bag' % (start_time, end_time)
     sync_topics = ['/sugv/velodyne_points',
                    '/zed2/zed_node_test/odom',
-                   '/zed2/zed_node_test/left_raw/image_raw_gray',
-                   '/tf']
+                   '/zed2/zed_node_test/left_raw/image_raw_gray']
     split_bag(src_bag, output_bag, start_time, end_time, sync_topics)
